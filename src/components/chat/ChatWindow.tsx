@@ -21,6 +21,7 @@ interface Message {
   files?: string[];
   createdAt: string;
   seen?: string[];
+  chatId?: string; // Added this property to fix the type error
 }
 
 interface Chat {
