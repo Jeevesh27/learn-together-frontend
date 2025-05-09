@@ -12,6 +12,7 @@ interface UserData {
 interface AuthContextType {
   user: UserData | null;
   isLoading: boolean;
+  apiError: boolean;
   login: (email: string, password: string) => Promise<void>;
   signup: (name: string, email: string, password: string, confirmPassword: string, role: "student" | "mentor") => Promise<boolean>;
   logout: () => Promise<void>;
@@ -35,6 +36,7 @@ interface AuthProviderProps {
 export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<UserData | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [apiError, setApiError] = useState<boolean>(false);
   
   const API_URL = "https://311a-160-22-60-12.ngrok-free.app/api/v1";
 
@@ -53,12 +55,15 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       if (response.ok) {
         const data = await response.json();
         setUser(data.userData);
+        setApiError(false);
       } else {
         setUser(null);
+        // Don't set API error for normal auth failures (like not logged in)
       }
     } catch (error) {
       console.error("Auth check failed:", error);
       setUser(null);
+      setApiError(true);
     } finally {
       setIsLoading(false);
     }
@@ -87,9 +92,18 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       }
 
       setUser(data.data.userData);
+      setApiError(false);
       toast.success("Login successful!");
     } catch (error: any) {
-      toast.error(error.message || "Login failed");
+      console.error("Login error:", error);
+      
+      // Check if it's a network error
+      if (error instanceof TypeError && error.message.includes("Failed to fetch")) {
+        setApiError(true);
+        toast.error("Unable to connect to the server. Please try again later.");
+      } else {
+        toast.error(error.message || "Login failed");
+      }
       throw error;
     } finally {
       setIsLoading(false);
@@ -167,6 +181,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       value={{
         user,
         isLoading,
+        apiError,
         login,
         signup,
         logout,
