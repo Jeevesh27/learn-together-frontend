@@ -1,8 +1,9 @@
 
-import { Navigate } from 'react-router-dom';
+import Dashboard from '@/components/dashboard/Dashboard';
 import { useAuth } from '@/contexts/AuthContext';
+import { Navigate } from 'react-router-dom';
 
-const Index = () => {
+const DashboardPage = () => {
   const { user, isLoading } = useAuth();
   
   if (isLoading) {
@@ -13,11 +14,11 @@ const Index = () => {
     );
   }
   
-  if (user) {
-    return <Navigate to="/dashboard" replace />;
+  if (!user) {
+    return <Navigate to="/login" replace />;
   }
   
-  return <Navigate to="/login" replace />;
+  return <Dashboard />;
 };
 
-export default Index;
+export default DashboardPage;

@@ -1,8 +1,9 @@
 
-import { Navigate } from 'react-router-dom';
+import Login from '@/components/auth/Login';
 import { useAuth } from '@/contexts/AuthContext';
+import { Navigate } from 'react-router-dom';
 
-const Index = () => {
+const LoginPage = () => {
   const { user, isLoading } = useAuth();
   
   if (isLoading) {
@@ -17,7 +18,7 @@ const Index = () => {
     return <Navigate to="/dashboard" replace />;
   }
   
-  return <Navigate to="/login" replace />;
+  return <Login />;
 };
 
-export default Index;
+export default LoginPage;
